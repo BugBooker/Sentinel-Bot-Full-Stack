@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel-Bot | Multimodal Verification</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="color: #2c3e50;">SENTINEL-BOT</h1>
+            <p style="color: #7f8c8d;">Final Year Project: Behavioral Biometrics Study</p>
+        </div>
+
+        <div class="card">
+            <h2>User Verification Study</h2>
+            <p>Please fill out this form naturally to help us train our detection system.</p>
+            
+            <form id="interactionForm">
+                <input type="text" id="username" placeholder="Full Name" required>
+                <input type="email" id="email" placeholder="Email Address" required>
+                <textarea id="message" placeholder="Type a short paragraph about your day..." required rows="5"></textarea>
+                
+                <button type="button" id="downloadBtn" class="submit-btn">
+                    Verify & Submit to Cloud
+                </button>
+            </form>
+            
+            <div id="statusMessage" style="margin-top: 15px; font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <script src="collector.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'sentinel_waf_backend'
+    metrics_path: '/metrics'
+    scheme: 'https'
+    
+    # Secure token validation pass-through logic
+    authorization:
+      type: Bearer
+      credentials: '0c864a24808b220af33229af5f45545a0ce71b2c073214996f283ecdda6d0ca9'
+      
+    static_configs:
+      - targets: ['sentinel-waf-inference-production.up.railway.app:443']

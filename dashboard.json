@@ -1,0 +1,403 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus Data Source Connection",
+      "description": "Select your active 'grafanacloud-bugbooker-prom' instance to sync the Sentinel-Bot telemetry stream.",
+      "type": "datasource",
+      "pluginId": "prometheus"
+    }
+  ],
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "row",
+      "title": "SECTION 1 — EXECUTIVE SYSTEM OVERVIEW",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 101,
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "GATEWAY",
+      "gridPos": { "h": 4, "w": 2, "x": 0, "y": 1 },
+      "id": 1,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "max(up{job=\"sentinel-bot\"})", "legendFormat": "Status" }],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "name" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": 0 }, { "color": "green", "value": 1 }] }, "mappings": [{ "type": "value", "value": "1", "text": "ONLINE" }, { "type": "value", "value": "0", "text": "OFFLINE" }] }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "TOTAL INGRESS TRAFFIC",
+      "gridPos": { "h": 4, "w": 3, "x": 2, "y": 1 },
+      "id": 2,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(sentinel_requests_total)", "legendFormat": "Ingress" }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" } } }
+    },
+    {
+      "type": "stat",
+      "title": "AUTHENTICATED HUMANS",
+      "gridPos": { "h": 4, "w": 3, "x": 5, "y": 1 },
+      "id": 3,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(sentinel_allowed_total)", "legendFormat": "Humans" }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "green", "mode": "fixed" } } }
+    },
+    {
+      "type": "stat",
+      "title": "DEFLECTED BOTS",
+      "gridPos": { "h": 4, "w": 3, "x": 8, "y": 1 },
+      "id": 4,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(sentinel_blocked_total)", "legendFormat": "Bots" }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "red", "mode": "fixed" } } }
+    },
+    {
+      "type": "stat",
+      "title": "PROTECTION COVERAGE INDEX (%)",
+      "gridPos": { "h": 4, "w": 3, "x": 11, "y": 1 },
+      "id": 5,
+      "targets": [{ 
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, 
+        "expr": "100 * (sum(sentinel_allowed_total) + sum(sentinel_blocked_total) + sum(sentinel_rate_limited_total) + sum(sentinel_overload_total)) / clamp_min(sum(sentinel_requests_total), 1)", 
+        "legendFormat": "Coverage" 
+      }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "unit": "percent", "color": { "fixedColor": "orange", "mode": "fixed" } } }
+    },
+    {
+      "type": "piechart",
+      "title": "Executive Traffic Split (Rolling 1H Window)",
+      "gridPos": { "h": 4, "w": 6, "x": 14, "y": 1 },
+      "id": 14,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_allowed_total[1h]))", "legendFormat": "Legitimate Humans" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_blocked_total[1h]))", "legendFormat": "Mitigated Attacks" }
+      ],
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["sum"] },
+        "pieType": "pie",
+        "legend": { "showLegend": true, "displayMode": "list", "placement": "right", "values": ["percent"] }
+      },
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Legitimate Humans" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Mitigated Attacks" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "stat",
+      "title": "CURRENT INGRESS VELOCITY",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 15,
+      "targets": [{ 
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, 
+        "expr": "sum(rate(sentinel_requests_total[1m]))", 
+        "legendFormat": "Throughput" 
+      }],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "fixedColor": "purple", "mode": "fixed" } } }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 2 — REAL-TIME THREAT MONITORING (ATTACK WAVES)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 102,
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Real-Time Ingress Velocity Decision Breakdown Profiles",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 6 },
+      "id": 6,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "rate(sentinel_allowed_total[1m])", "legendFormat": "Allowed Humans" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "rate(sentinel_blocked_total[1m])", "legendFormat": "Blocked Bots" }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 15, "drawStyle": "line", "spanNulls": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Allowed Humans" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Blocked Bots" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 3 — JA4 TLS FINGERPRINT INTELLIGENCE",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "id": 103,
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "ACTIVE JA4 PREFIX DIVERSITY (COUNT)",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 14 },
+      "id": 131,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "count(count by (ja4_prefix) (sentinel_ja4_observed_total))", "legendFormat": "Unique Hashes" }],
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "cyan", "mode": "fixed" } } }
+    },
+    {
+      "type": "barchart",
+      "title": "Top 10 Active Client-Side TLS Handshake Signatures",
+      "gridPos": { "h": 6, "w": 18, "x": 6, "y": 14 },
+      "id": 132,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "topk(10, sum by (ja4_prefix) (increase(sentinel_ja4_observed_total[1h])))", "legendFormat": "{{ja4_prefix}}" }],
+      "options": { "orientation": "horizontal" }
+    },
+    {
+      "type": "timeseries",
+      "title": "Cross-Layer Ingress Volumetric Ingestion Trends",
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 20 },
+      "id": 21,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_requests_total[5m]))", "legendFormat": "Network Packet Transactions Ingested" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_allowed_total[5m]))", "legendFormat": "Biometric Evaluation Flows Cleared" }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "drawStyle": "points", "pointSize": 6 } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Network Packet Transactions Ingested" }, "properties": [{ "id": "color", "value": { "fixedColor": "cyan", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Biometric Evaluation Flows Cleared" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "JA4 Fingerprint Class Distribution Matrix",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 25 },
+      "id": 133,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_human_ja4_total[1h]))", "legendFormat": "Legitimate TLS Handshakes" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_bot_ja4_total[1h]))", "legendFormat": "Automated Spoof / Library Vectors" }
+      ],
+      "options": { "reduceOptions": { "values": false, "calcs": ["sum"] }, "pieType": "donut" },
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Legitimate TLS Handshakes" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Automated Spoof / Library Vectors" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Holistic Edge Policy Decision Distribution (Rolling 1H Delta)",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 25 },
+      "id": 73,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_allowed_total[1h]))", "legendFormat": "Inference Engine: ALLOWED HUMANS" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_blocked_total[1h]))", "legendFormat": "Inference Engine: BLOCKED BOTNETS" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_rate_limited_total[1h]))", "legendFormat": "Perimeter Guard: HTTP 429 RATE LIMITED" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_overload_total[1h]))", "legendFormat": "Infrastructure Buffer: HTTP 503 OVERLOAD SHED" }
+      ],
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["sum"] },
+        "pieType": "donut",
+        "legend": { "showLegend": true, "displayMode": "table", "placement": "right", "values": ["value", "percent"] }
+      },
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Inference Engine: ALLOWED HUMANS" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Inference Engine: BLOCKED BOTNETS" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Perimeter Guard: HTTP 429 RATE LIMITED" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Infrastructure Buffer: HTTP 503 OVERLOAD SHED" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 4 — BEHAVIORAL BIOMETRICS & KINEMATRIC TELEMETRY",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "id": 104,
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "MEAN MOUSE CURVE ENTROPY",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 32 },
+      "id": 141,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_mouse_entropy[5m])", "legendFormat": "Entropy" }],
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "MEAN KEYSTROKE DWELL TIME (MS)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 32 },
+      "id": 142,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_avg_dwell_time[5m])", "legendFormat": "DwellTime" }],
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "MEAN TRAVERSAL FLIGHT TIME (MS)",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 32 },
+      "id": 143,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_avg_flight_time[5m])", "legendFormat": "FlightTime" }],
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "stat",
+      "title": "DIRECTION ALTERATION RATE",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 32 },
+      "id": 144,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_direction_changes[5m])", "legendFormat": "VectorChanges" }],
+      "options": { "colorMode": "value", "graphMode": "area" }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 5 — AI HYBRID MULTI-MODEL ENSEMBLE CONFIDENCE INSIGHTS",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 36 },
+      "id": 109,
+      "collapsed": false
+    },
+    {
+      "type": "gauge",
+      "title": "XGBOOST PROBABILITY",
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 37 },
+      "id": 151,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_xgb_probability[5m])", "legendFormat": "XGB Confidence" }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 0.8 }] } } }
+    },
+    {
+      "type": "gauge",
+      "title": "RANDOM FOREST PROBABILITY",
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 37 },
+      "id": 152,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_rf_probability[5m])", "legendFormat": "RF Confidence" }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 0.8 }] } } }
+    },
+    {
+      "type": "gauge",
+      "title": "CALIBRATED SVM PROBABILITY",
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 37 },
+      "id": 153,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_svm_probability[5m])", "legendFormat": "SVM Confidence" }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 0.8 }] } } }
+    },
+    {
+      "type": "gauge",
+      "title": "FINAL ENSEMBLE OUTPUT INDEX",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 37 },
+      "id": 154,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "avg_over_time(sentinel_ensemble_probability[5m])", "legendFormat": "Meta-Learner Probability" }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 0.8 }] } } }
+    },
+    {
+      "type": "timeseries",
+      "title": "ENSEMBLE MODEL CONFIDENCE TREND",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 37 },
+      "id": 159,
+      "targets": [{
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "expr": "avg_over_time(sentinel_ensemble_probability[5m])",
+        "legendFormat": "Bot Probability Margin"
+      }],
+      "fieldConfig": {
+        "defaults": { "custom": { "drawStyle": "line" } },
+        "overrides": [{ "matcher": { "id": "byName", "options": "Bot Probability Margin" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }]
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "REAL-TIME ENSEMBLE OUTPUT PROBABILITY DENSITY DISTRIBUTION HISTOGRAM",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 42 },
+      "id": 155,
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "sum(increase(sentinel_ensemble_probability_distribution_bucket[5m])) by (le)",
+          "legendFormat": "Probability Threshold: <= {{le}}"
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "reduceOptions": { "values": true, "calcs": ["last"] }
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 6 — AI HYBRID ENSEMBLE INFERENCE ENGINE PERFORMANCE",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 },
+      "id": 114,
+      "collapsed": false
+    },
+    {
+      "type": "gauge",
+      "title": "Live Stacking Worker Thread Utilization",
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 49 },
+      "id": 10,
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(sentinel_active_inference)", "legendFormat": "Active Core Workers" }],
+      "fieldConfig": {
+        "defaults": { "unit": "none", "max": 32, "min": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 16 }, { "color": "red", "value": 26 }] } }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput vs Latency Operational Correlation Profiles",
+      "gridPos": { "h": 6, "w": 20, "x": 4, "y": 49 },
+      "id": 11,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "rate(sentinel_requests_total[5m])", "legendFormat": "Inbound Request Throughput (Req/s)" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "histogram_quantile(0.99, sum(rate(sentinel_inference_latency_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P99 Inference Latency Ceiling (ms)" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "histogram_quantile(0.95, sum(rate(sentinel_inference_latency_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P95 Inference Latency Ceiling (ms)" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "(sum(rate(sentinel_inference_latency_seconds_sum[5m])) / clamp_min(sum(rate(sentinel_inference_latency_seconds_count[5m])), 1)) * 1000", "legendFormat": "Mean Execution Latency Baseline (ms)" }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "spanNulls": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Inbound Request Throughput (Req/s)" }, "properties": [{ "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "P99 Inference Latency Ceiling (ms)" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "P95 Inference Latency Ceiling (ms)" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Mean Execution Latency Baseline (ms)" }, "properties": [{ "id": "color", "value": { "fixedColor": "cyan", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "title": "SECTION 7 — AUTOMATED MITIGATION & DEFENSIVE CONTROLS",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 },
+      "id": 105,
+      "collapsed": false
+    },
+    {
+      "type": "bargauge",
+      "title": "Active Perimeter Defensive Enforcement Actions",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 56 },
+      "id": 99,
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_rate_limited_total[5m]))", "legendFormat": "HTTP 429 Rate-Limit Restrictions Imposed" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_overload_total[5m]))", "legendFormat": "HTTP 503 Semaphore Load-Shedding Drops" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_validation_failures_total[5m]))", "legendFormat": "HTTP 400 Malformed Structural Payload Drops" },
+        { "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" }, "expr": "sum(increase(sentinel_failed_total[5m]))", "legendFormat": "Core Pipeline Execution Unhandled Exceptions" }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient" },
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "HTTP 429 Rate-Limit Restrictions Imposed" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "HTTP 503 Semaphore Load-Shedding Drops" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "HTTP 400 Malformed Structural Payload Drops" }, "properties": [{ "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Core Pipeline Execution Unhandled Exceptions" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "title": "SENTINEL-BOT SOC DASHBOARD v1.5",
+  "time": { "from": "now-12h", "to": "now" }
+}

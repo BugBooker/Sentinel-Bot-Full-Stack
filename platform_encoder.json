@@ -1,0 +1,6 @@
+{
+  "Win32": 1.0,
+  "MacIntel": 2.0,
+  "Linux x86_64": 3.0,
+  "unknown": 0.0
+}

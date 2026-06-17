@@ -1,0 +1,126 @@
+/* ======================================================================
+   SENTINEL-BOT OPERATIONAL STYLE MATRIX
+   style.css v4.7 Hardened Distributed Application Layer Theme
+   ====================================================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+h1 { font-size: 1.8rem; margin: 0; }
+h2 { color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.4rem; }
+p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.4; }
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Guarantees boundary layout stability */
+    font-size: 0.95rem;
+}
+
+input:focus, textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* CONSOLIDATED ACTION BUTTON CORE */
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Controls color morphing transitions cleanly */
+}
+
+.submit-btn:hover { 
+    background-color: #2980b9; 
+}
+
+/* PRODUCTION-READY MULTIMODAL SLO STATUS CONTAINER */
+#statusMessage {
+    margin-top: 15px; 
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 4px;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 1px solid transparent;
+    display: none; /* Controlled dynamically by your engine script hooks */
+    transition: all 0.3s ease;
+}
+
+/* --- DARK THEME OVERRIDES (Inference Gateway) --- */
+.dark-theme {
+    background-color: #0b0f14 !important; /* Matches modern SOC canvas panels */
+    color: #e2e8f0 !important;
+}
+
+.dark-theme .container {
+    background: #11161d !important; /* Dark slate panel container bounding box */
+    border: 1px solid #1f2933;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.dark-theme h1 { color: #38bdf8 !important; text-shadow: 0 0 10px rgba(56,189,248,0.2); }
+.dark-theme h2 { color: #e2e8f0 !important; }
+.dark-theme p { color: #94a3b8 !important; }
+
+.dark-theme input,
+.dark-theme textarea {
+    background-color: #0b0f14 !important;
+    border: 1px solid #2a333d !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease;
+}
+
+.dark-theme input:focus,
+.dark-theme textarea:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 2px rgba(56,189,248,0.15);
+    outline: none;
+}
+
+/* Hardened High-Contrast Verification Submit Action Panel */
+.dark-theme .submit-btn {
+    background-color: #38bdf8 !important; /* Cyber Blue highlight button */
+    color: #0b0f14 !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dark-theme .submit-btn:hover {
+    background-color: #0ea5e9 !important;
+    box-shadow: 0 0 15px rgba(14,165,233,0.4);
+}
